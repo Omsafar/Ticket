@@ -1,6 +1,6 @@
 using Microsoft.Identity.Client;
 using Microsoft.Graph;
-using Microsoft.Graph.Auth;
+using Microsoft.Graph.Authentication;
 using System.Threading.Tasks;
 
 namespace TicketingApp.Graph

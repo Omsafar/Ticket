@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Windows;
-using Ticket;
 using TicketingApp.Data;
 using TicketingApp.Graph;
 using TicketingApp.Services;
