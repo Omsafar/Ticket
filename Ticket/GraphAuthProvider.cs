@@ -1,38 +1,34 @@
-using Microsoft.Identity.Client;
+// GraphAuthProvider.cs
+using Azure.Identity;
 using Microsoft.Graph;
-using Microsoft.Graph.Authentication;
 using System.Threading.Tasks;
 
 namespace TicketingApp.Graph
 {
     public static class GraphAuthProvider
     {
-        private const string CLIENT_ID = "<210dc5bc-cbb0-4cf5-bd62-7aea37c84608>";
-        private const string TENANT_ID = "<419d9c9c-52c4-4cd1-8001-a350f5526c44>"; // directory (tenant) ID
-        private static readonly string[] SCOPES =
-        {
-            "User.Read",              // info utente
-            "Mail.Read.Shared"        // lettura mail caselle condivise
-        };
+        private const string CLIENT_ID = "210dc5bc-cbb0-4cf5-bd62-7aea37c84608";
+        private const string TENANT_ID = "419d9c9c-52c4-4cd1-8001-a350f5526c44";
 
-        private static IPublicClientApplication _pca;
-        private static InteractiveAuthenticationProvider _authProvider;
+        // Gli scope *delegated* che vogliamo
+        private static readonly string[] SCOPES = { "User.Read", "Mail.Read.Shared" };
 
         public static GraphServiceClient GraphClient { get; private set; }
 
         public static async Task InitializeAsync()
         {
-            _pca = PublicClientApplicationBuilder
-                .Create(CLIENT_ID)
-                .WithAuthority(AzureCloudInstance.AzurePublic, TENANT_ID)
-                .WithDefaultRedirectUri()
-                .Build();
+            // apre il browser di sistema per il login (SSO M365)
+            var credential = new InteractiveBrowserCredential(
+                new InteractiveBrowserCredentialOptions
+                {
+                    TenantId = TENANT_ID,
+                    ClientId = CLIENT_ID
+                });
 
-            _authProvider = new InteractiveAuthenticationProvider(_pca, SCOPES);
-            GraphClient = new GraphServiceClient(_authProvider);
+            GraphClient = new GraphServiceClient(credential, SCOPES);
 
-            // Effettua un primo login per popolare il token cache
-            await GraphClient.Me.Request().GetAsync();
+            // chiamata di test per forzare il token
+            await GraphClient.Me.GetAsync();
         }
     }
 }

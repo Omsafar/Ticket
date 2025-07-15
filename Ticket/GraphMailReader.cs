@@ -1,7 +1,9 @@
+using Microsoft.Graph;
+using Microsoft.Graph.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Graph;
 
 namespace TicketingApp.Graph
 {
@@ -25,22 +27,23 @@ namespace TicketingApp.Graph
                 .Users[_sharedMailboxAddress]
                 .MailFolders["Inbox"]
                 .Messages
-                .Request()
-                .Filter(filter)
-                .Select(m => new
+                .GetAsync(req =>
                 {
-                    m.Id,
-                    m.Subject,
-                    m.Body,
-                    m.ReceivedDateTime,
-                    m.Sender,
-                    m.From,
-                    m.ToRecipients
-                })
-                .Top(50)
-                .GetAsync();
+                    req.QueryParameters.Filter = filter;
+                    req.QueryParameters.Top = 50;
+                    req.QueryParameters.Select = new[]
+                    {
+                        "id",
+                        "subject",
+                        "body",
+                        "receivedDateTime",
+                        "sender",
+                        "from",
+                        "toRecipients"
+                    };
+                });
 
-            return messages.CurrentPage;
+            return messages?.Value ?? Enumerable.Empty<Message>();
         }
     }
 }

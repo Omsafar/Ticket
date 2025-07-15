@@ -10,11 +10,20 @@ namespace TicketingApp.Data
         public DbSet<Ticket> Tickets { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
+
         {
-            // Imposta il seed iniziale IDENTITY = 82
+            base.OnModelCreating(modelBuilder);
+
+            // Fai sì che l'entità Ticket venga letta da dbo.Ticket (singolare)
+            modelBuilder.Entity<Ticket>()
+                .ToTable("Ticket");           // <— nome tabella esatto nel DB
+
+            // (Già presente) imposta l'identity seed a 82
             modelBuilder.Entity<Ticket>()
                 .Property(t => t.TicketId)
                 .UseIdentityColumn(seed: 82, increment: 1);
         }
+
     }
 }
+

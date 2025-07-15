@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿// App.xaml.cs
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Windows;
 using TicketingApp.Data;
 using TicketingApp.Graph;
@@ -16,18 +16,22 @@ namespace TicketingApp
         {
             var services = new ServiceCollection();
 
-            // 1. EF Core
+            // 1) EF Core
             services.AddDbContext<TicketContext>(options =>
-                options.UseSqlServer("<CONNECTION_STRING_HERE>"));
+        options.UseSqlServer("Server=192.168.1.24\\sgam;Database=PARATORI;User Id=sapara;Password=S@p4ra;Encrypt=True;TrustServerCertificate=True;")
+        );
 
-            // 2. Repository
+            // 2) Repository
             services.AddScoped<TicketRepository>();
 
-            // 3. Graph
-            services.AddSingleton(s => new GraphMailReader("ticket@paratorispa.it"));
+            // 3) GraphMailReader
+            services.AddSingleton(s => new GraphMailReader("support.ticket@paratorispa.it"));
 
-            // 4. TicketManager (background sync)
+            // 4) TicketManager
             services.AddSingleton<TicketManager>();
+
+            // 5) Registra la MainWindow
+            services.AddTransient<MainWindow>();
 
             _serviceProvider = services.BuildServiceProvider();
         }
@@ -36,21 +40,21 @@ namespace TicketingApp
         {
             base.OnStartup(e);
 
-            // Inizializza Graph + login
+            // Autenticazione e inizializzazione Graph
             await GraphAuthProvider.InitializeAsync();
 
-            // Avvia sync in background
+            // Avvia sincronizzazione in background
             var ticketManager = _serviceProvider.GetRequiredService<TicketManager>();
             _ = Task.Run(async () =>
             {
                 while (true)
                 {
-                    await ticketManager.SyncAsync(System.Threading.CancellationToken.None);
+                    await ticketManager.SyncAsync(CancellationToken.None);
                     await Task.Delay(TimeSpan.FromMinutes(1));
                 }
             });
 
-            // Mostra la finestra principale
+            // Risolvi ed apri la finestra principale
             var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
             mainWindow.Show();
         }
