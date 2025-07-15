@@ -29,9 +29,11 @@ namespace TicketingApp.Services
             var newMessages = await _mailReader.GetNewMessagesAsync(_lastSync);
             foreach (var msg in newMessages)
             {
-                // Crea ticket per ogni mail
+                if (await _repo.FindByGraphMessageIdAsync(msg.Id) != null)
+                    continue;
                 var ticket = new Ticket
                 {
+                    GraphMessageId = msg.Id,
                     MittenteEmail = msg.From?.EmailAddress?.Address ?? "unknown",
                     Oggetto = msg.Subject,
                     Corpo = msg.Body?.Content ?? string.Empty,

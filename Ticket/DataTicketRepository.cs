@@ -12,8 +12,7 @@ namespace TicketingApp.Data
 
         public async Task<Ticket?> FindByGraphMessageIdAsync(string graphMessageId)
         {
-            // Facoltativo: se vuoi salvare anche l'ID del messaggio per evitare duplicati
-            return await _ctx.Tickets.FirstOrDefaultAsync(t => t.Corpo.Contains(graphMessageId));
+            return await _ctx.Tickets.FirstOrDefaultAsync(t => t.GraphMessageId == graphMessageId);
         }
 
         public async Task<Ticket> CreateAsync(Ticket ticket)

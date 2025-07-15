@@ -34,6 +34,11 @@ namespace TicketingApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("GraphMessageId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<DateTime>("DataApertura")
                         .HasColumnType("datetime2");
 
@@ -58,6 +63,10 @@ namespace TicketingApp.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.HasKey("TicketId");
+
+                    b.HasIndex("GraphMessageId")
+                        .IsUnique();
+
 
                     b.ToTable("Ticket", (string)null);
                 });

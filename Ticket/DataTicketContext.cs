@@ -22,6 +22,16 @@ namespace TicketingApp.Data
             modelBuilder.Entity<Ticket>()
                 .Property(t => t.TicketId)
                 .UseIdentityColumn(seed: 82, increment: 1);
+
+            modelBuilder.Entity<Ticket>()
+            .Property(t => t.GraphMessageId)
+            .HasMaxLength(200)
+            .IsRequired();
+
+            modelBuilder.Entity<Ticket>()
+                .HasIndex(t => t.GraphMessageId)
+                .IsUnique();
+        
         }
 
     }
