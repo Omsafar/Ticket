@@ -14,6 +14,7 @@ namespace TicketingApp.Graph
         private static readonly string[] SCOPES = { "User.Read", "Mail.Read.Shared" };
 
         public static GraphServiceClient GraphClient { get; private set; }
+        public static string? CurrentUserEmail { get; private set; }
 
         public static async Task InitializeAsync()
         {
@@ -27,8 +28,9 @@ namespace TicketingApp.Graph
 
             GraphClient = new GraphServiceClient(credential, SCOPES);
 
-            // chiamata di test per forzare il token
-            await GraphClient.Me.GetAsync();
+            // recupera l'utente per ottenere l'email e forzare il token
+            var me = await GraphClient.Me.GetAsync();
+            CurrentUserEmail = me.Mail ?? me.UserPrincipalName;
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using TicketingApp.Models;
@@ -23,5 +24,16 @@ namespace TicketingApp.Data
         }
 
         public IQueryable<Ticket> GetAll() => _ctx.Tickets.AsNoTracking();
+
+        public async Task UpdateStatusAsync(int ticketId, string newStatus)
+        {
+            var ticket = await _ctx.Tickets.FindAsync(ticketId);
+            if (ticket == null)
+                return;
+
+            ticket.Stato = newStatus;
+            ticket.DataUltimaModifica = DateTime.UtcNow;
+            await _ctx.SaveChangesAsync();
+        }
     }
 }
