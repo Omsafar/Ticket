@@ -43,8 +43,16 @@ namespace TicketingApp
             // Autenticazione e inizializzazione Graph
             await GraphAuthProvider.InitializeAsync();
 
-            // Avvia sincronizzazione in background
             var ticketManager = _serviceProvider.GetRequiredService<TicketManager>();
+
+            // Prima sincronizzazione bloccante all'avvio
+            await ticketManager.SyncAsync(CancellationToken.None);
+
+            // Risolvi ed apri la finestra principale
+            var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
+            mainWindow.Show();
+
+            // Sync ciclico in background
             _ = Task.Run(async () =>
             {
                 while (true)
@@ -54,9 +62,6 @@ namespace TicketingApp
                 }
             });
 
-            // Risolvi ed apri la finestra principale
-            var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
-            mainWindow.Show();
         }
     }
 }

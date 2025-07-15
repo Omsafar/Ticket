@@ -11,15 +11,29 @@ namespace TicketingApp
     {
         public ObservableCollection<Ticket> Tickets { get; } = new();
 
-        public MainWindow(TicketRepository repo)
+        private readonly TicketRepository _repo;
+
+        public MainWindow(TicketRepository repo, Services.TicketManager manager)
         {
             InitializeComponent();
             DataContext = this;
 
+            _repo = repo;
+
             // Carica i ticket dal DB
-            var all = repo.GetAll().OrderByDescending(t => t.TicketId).ToList();
+            var all = _repo.GetAll().OrderByDescending(t => t.TicketId).ToList();
             foreach (var t in all)
                 Tickets.Add(t);
+
+            manager.TicketsSynced += () =>
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    Tickets.Clear();
+                    foreach (var t in _repo.GetAll().OrderByDescending(t => t.TicketId))
+                        Tickets.Add(t);
+                });
+            };
         }
     }
 }
