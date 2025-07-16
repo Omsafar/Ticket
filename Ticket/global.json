@@ -1,0 +1,6 @@
+﻿{
+	"sdk": {
+		"version": "8.0.406", // o qualunque versione 8.x tu abbia installato
+		"rollForward": "disable"
+	}
+}
