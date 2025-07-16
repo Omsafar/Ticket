@@ -19,6 +19,7 @@ namespace TicketingApp
         private readonly bool _isAdmin;
         private readonly string _currentEmail;
         private readonly TicketRepository _repo;
+        private readonly Services.TicketManager _manager;
 
         public MainWindow(TicketRepository repo, Services.TicketManager manager)
         {
@@ -26,19 +27,14 @@ namespace TicketingApp
             DataContext = this;
 
             _repo = repo;
+            _manager = manager;
 
             _currentEmail = GraphAuthProvider.CurrentUserEmail ?? string.Empty;
-            var adminEmails = new[]
-            {
-                "omar.tagliabue@paratorispa.it",
-                "stefano.biffi@paratorispa.it",
-                "admin@paratorispa.onmicrosoft.com"
-            };
-            _isAdmin = adminEmails.Any(e => string.Equals(e, _currentEmail, StringComparison.OrdinalIgnoreCase));
 
+            _isAdmin = AdminSettings.Emails.Any(e => string.Equals(e, _currentEmail, StringComparison.OrdinalIgnoreCase));
             LoadTickets();
 
-            manager.TicketsSynced += () =>
+            _manager.TicketsSynced += () =>
             {
                 Application.Current.Dispatcher.Invoke(LoadTickets);
             };
@@ -64,6 +60,7 @@ namespace TicketingApp
                 if (e.Row.Item is Ticket ticket)
                 {
                     await _repo.UpdateStatusAsync(ticket.TicketId, ticket.Stato);
+                    _manager.NotifyTicketsChanged();
                 }
             }
         }

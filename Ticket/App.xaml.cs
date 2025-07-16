@@ -45,6 +45,9 @@ namespace TicketingApp
 
             var ticketManager = _serviceProvider.GetRequiredService<TicketManager>();
 
+            var currentEmail = GraphAuthProvider.CurrentUserEmail ?? string.Empty;
+            ticketManager.CanSync = AdminSettings.Emails.Any(e => string.Equals(e, currentEmail, StringComparison.OrdinalIgnoreCase));
+
             // Prima sincronizzazione bloccante all'avvio
             await ticketManager.SyncAsync(CancellationToken.None);
 

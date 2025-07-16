@@ -14,7 +14,11 @@ namespace TicketingApp.Services
         private readonly TicketRepository _repo;
         private DateTimeOffset _lastSync;
 
+        public bool CanSync { get; set; }
+
         public event Action? TicketsSynced;
+
+        public void NotifyTicketsChanged() => TicketsSynced?.Invoke();
 
         public TicketManager(GraphMailReader mailReader, TicketRepository repo)
         {
@@ -26,6 +30,12 @@ namespace TicketingApp.Services
 
         public async Task SyncAsync(CancellationToken ct)
         {
+            if (!CanSync)
+            {
+                TicketsSynced?.Invoke();
+                return;
+            }
+
             var newMessages = await _mailReader.GetNewMessagesAsync(_lastSync);
             foreach (var msg in newMessages)
             {
