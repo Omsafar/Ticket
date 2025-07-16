@@ -9,9 +9,9 @@ namespace TicketingApp.Graph
     {
         private readonly GraphServiceClient _graph;
 
-        public GraphMailSender(GraphServiceClient graphClient)
+        public GraphMailSender()
         {
-            _graph = graphClient;
+            _graph = GraphAuthProvider.GraphClient;
         }
 
         public async Task SendTicketCreatedNotificationAsync(
@@ -33,12 +33,16 @@ namespace TicketingApp.Graph
                     new Recipient { EmailAddress = new EmailAddress { Address = toAddress } }
                 }
             };
+            var requestBody = new Microsoft.Graph.Users.Item.SendMail.SendMailPostRequestBody
+            {
+                Message = mail,
+                SaveToSentItems = true
+            };
 
             await _graph
                 .Users[fromSharedMailbox]
-                .SendMail(mail, saveToSentItems: true)
-                .Request()
-                .PostAsync();
+                 .SendMail
+                .PostAsync(requestBody);
         }
     }
 }
