@@ -14,7 +14,9 @@ namespace TicketingApp.Services
         private readonly TicketRepository _repo;
         private DateTimeOffset _lastSync;
 
-        public bool CanSync { get; set; }
+        public bool CanSync { get; set; } = true;
+        public string CurrentUserEmail { get; set; } = string.Empty;
+        public bool IsAdmin { get; set; }
 
         public event Action? TicketsSynced;
 
@@ -36,7 +38,8 @@ namespace TicketingApp.Services
                 return;
             }
 
-            var newMessages = await _mailReader.GetNewMessagesAsync(_lastSync);
+            var filterEmail = IsAdmin ? null : CurrentUserEmail;
+            var newMessages = await _mailReader.GetNewMessagesAsync(_lastSync, filterEmail);
             foreach (var msg in newMessages)
             {
                 if (await _repo.FindByGraphMessageIdAsync(msg.Id) != null)

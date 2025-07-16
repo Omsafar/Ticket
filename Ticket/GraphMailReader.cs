@@ -18,10 +18,15 @@ namespace TicketingApp.Graph
             _sharedMailboxAddress = sharedMailboxAddress;
         }
 
-        public async Task<IEnumerable<Message>> GetNewMessagesAsync(DateTimeOffset since)
+        public async Task<IEnumerable<Message>> GetNewMessagesAsync(DateTimeOffset since, string? fromEmail = null)
         {
             // Filtro: ricevute dopo `since`, solo Inbox.
             var filter = $"receivedDateTime ge {since.UtcDateTime:o}";
+            if (!string.IsNullOrEmpty(fromEmail))
+            {
+                var emailEscaped = fromEmail.Replace("'", "''");
+                filter += $" and from/emailAddress/address eq '{emailEscaped}'";
+            }
 
             var messages = await _client
                 .Users[_sharedMailboxAddress]
