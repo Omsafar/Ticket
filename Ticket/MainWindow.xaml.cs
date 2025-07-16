@@ -73,7 +73,11 @@ namespace TicketingApp
                 {
                     Header = "Stato",
                     ItemsSource = States,
-                    SelectedItemBinding = new Binding("Stato") { Mode = BindingMode.TwoWay },
+                    SelectedItemBinding = new Binding("Stato")
+                    {
+                        Mode = BindingMode.TwoWay,
+                        UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+                    },
                     IsReadOnly = !_isAdmin
                 };
                 e.Column = col;

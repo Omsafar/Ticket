@@ -12,6 +12,10 @@
                   ItemsSource="{Binding Tickets}"
                   AutoGenerateColumns="True"
                   AutoGeneratingColumn="TicketGrid_AutoGeneratingColumn"
-                  CellEditEnding="TicketGrid_CellEditEnding"/>
+                  CellEditEnding="TicketGrid_CellEditEnding"
+                  SelectionUnit="Cell"
+                  EnableRowVirtualization="True"
+                  EnableColumnVirtualization="True"
+                  VirtualizingPanel.ScrollUnit="Pixel"/>
     </Grid>
 </Window>
