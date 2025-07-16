@@ -7,8 +7,12 @@
         xmlns:local="clr-namespace:TicketingApp"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        <DataGrid x:Name="TicketGrid"
+    <DockPanel>
+        <Button x:Name="SyncButton"
+                Content="Controlla nuovi ticket"
+                Click="SyncButton_Click"
+                DockPanel.Dock="Top"
+                Margin="5"/>        <DataGrid x:Name="TicketGrid"
                   ItemsSource="{Binding Tickets}"
                   AutoGenerateColumns="True"
                   AutoGeneratingColumn="TicketGrid_AutoGeneratingColumn"
@@ -17,5 +21,5 @@
                   EnableRowVirtualization="True"
                   EnableColumnVirtualization="True"
                   VirtualizingPanel.ScrollUnit="Pixel"/>
-    </Grid>
+    </DockPanel>
 </Window>

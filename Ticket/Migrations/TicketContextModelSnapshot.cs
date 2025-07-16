@@ -39,6 +39,11 @@ namespace TicketingApp.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<string>("ConversationId")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<DateTime>("DataApertura")
                         .HasColumnType("datetime2");
 
@@ -67,6 +72,8 @@ namespace TicketingApp.Migrations
                     b.HasIndex("GraphMessageId")
                         .IsUnique();
 
+                    b.HasIndex("ConversationId")
+                        .IsUnique();
 
                     b.ToTable("Ticket", (string)null);
                 });

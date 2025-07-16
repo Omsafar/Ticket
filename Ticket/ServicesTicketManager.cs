@@ -46,23 +46,35 @@ namespace TicketingApp.Services
             {
                 if (await _repo.FindByGraphMessageIdAsync(msg.Id) != null)
                     continue;
+
+                var convId = msg.ConversationId ?? string.Empty;
+                var existing = await _repo.FindByConversationIdAsync(convId);
+                if (existing != null)
+                {
+                    await _repo.AppendMessageAsync(existing.TicketId,
+                        msg.ReceivedDateTime?.UtcDateTime ?? DateTime.UtcNow,
+                        msg.Body?.Content ?? string.Empty);
+                    continue;
+                }
+
                 var ticket = new Ticket
                 {
                     GraphMessageId = msg.Id,
+                    ConversationId = convId,
                     MittenteEmail = msg.From?.EmailAddress?.Address ?? "unknown",
                     Oggetto = msg.Subject,
                     Corpo = msg.Body?.Content ?? string.Empty,
                     Stato = "Aperto",
                     DataApertura = msg.ReceivedDateTime?.UtcDateTime ?? DateTime.UtcNow,
-                    DataUltimaModifica = DateTime.UtcNow
+                    DataUltimaModifica = msg.ReceivedDateTime?.UtcDateTime ?? DateTime.UtcNow
                 };
 
                 await _repo.CreateAsync(ticket);
                 await _mailSender.SendTicketCreatedNotificationAsync(
-                "support.ticket@paratorispa.it",
-                ticket.MittenteEmail,
-                ticket.TicketId,
-                ticket.Oggetto);
+                    "support.ticket@paratorispa.it",
+                    ticket.MittenteEmail,
+                    ticket.TicketId,
+                    ticket.Oggetto);
             }
             _lastSync = DateTimeOffset.UtcNow;
 

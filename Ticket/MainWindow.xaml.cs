@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Data;
 using TicketingApp.Graph;
+using System.Threading;
 
 namespace TicketingApp
 {
@@ -38,6 +39,8 @@ namespace TicketingApp
             {
                 Application.Current.Dispatcher.Invoke(LoadTickets);
             };
+
+            SyncButton.Visibility = _isAdmin ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void LoadTickets()
@@ -86,6 +89,10 @@ namespace TicketingApp
             {
                 e.Cancel = true;
             }
+        }
+        private async void SyncButton_Click(object sender, RoutedEventArgs e)
+        {
+            await _manager.SyncAsync(CancellationToken.None);
         }
     }
 }

@@ -41,6 +41,7 @@ namespace TicketingApp.Graph
                         "id",
                         "subject",
                         "body",
+                        "conversationId",
                         "receivedDateTime",
                         "sender",
                         "from",

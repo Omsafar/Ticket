@@ -27,11 +27,18 @@ namespace TicketingApp.Data
             .Property(t => t.GraphMessageId)
             .HasMaxLength(200)
             .IsRequired();
+             modelBuilder.Entity<Ticket>()
+            .Property(t => t.ConversationId)
+            .HasMaxLength(200)
+            .IsRequired();
 
             modelBuilder.Entity<Ticket>()
                 .HasIndex(t => t.GraphMessageId)
                 .IsUnique();
-        
+            modelBuilder.Entity<Ticket>()
+                .HasIndex(t => t.ConversationId)
+                .IsUnique();
+
         }
 
     }

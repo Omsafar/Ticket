@@ -23,6 +23,22 @@ namespace TicketingApp.Data
             return ticket;
         }
 
+        public async Task<Ticket?> FindByConversationIdAsync(string conversationId)
+        {
+            return await _ctx.Tickets.FirstOrDefaultAsync(t => t.ConversationId == conversationId);
+        }
+
+        public async Task AppendMessageAsync(int ticketId, DateTime receivedDate, string body)
+        {
+            var ticket = await _ctx.Tickets.FindAsync(ticketId);
+            if (ticket == null)
+                return;
+
+            ticket.DataUltimaModifica = receivedDate;
+            ticket.Corpo += "\n---\n" + body;
+            await _ctx.SaveChangesAsync();
+        }
+
         public IQueryable<Ticket> GetAll() => _ctx.Tickets.AsNoTracking();
 
         public async Task UpdateStatusAsync(int ticketId, string newStatus)

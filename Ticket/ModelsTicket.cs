@@ -29,6 +29,10 @@ namespace TicketingApp.Models
         public string GraphMessageId { get; set; }
 
         [Required]
+        [MaxLength(200)]
+        public string ConversationId { get; set; }
+
+        [Required]
         [MaxLength(20)]
         public string Stato { get; set; } = "Aperto"; // default
 

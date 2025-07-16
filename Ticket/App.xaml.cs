@@ -60,15 +60,7 @@ namespace TicketingApp
             var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
             mainWindow.Show();
 
-            // Sync ciclico in background
-            _ = Task.Run(async () =>
-            {
-                while (true)
-                {
-                    await ticketManager.SyncAsync(CancellationToken.None);
-                    await Task.Delay(TimeSpan.FromMinutes(1));
-                }
-            });
+            // La sincronizzazione sarà avviata manualmente dall'amministratore
 
         }
     }
