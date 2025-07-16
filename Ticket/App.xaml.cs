@@ -27,10 +27,13 @@ namespace TicketingApp
             // 3) GraphMailReader
             services.AddSingleton(s => new GraphMailReader("support.ticket@paratorispa.it"));
 
-            // 4) TicketManager
+            // 4) GraphMailSender
+            services.AddSingleton<GraphMailSender>();
+
+            // 5) TicketManager
             services.AddSingleton<TicketManager>();
 
-            // 5) Registra la MainWindow
+            // 6) Registra la MainWindow
             services.AddTransient<MainWindow>();
 
             _serviceProvider = services.BuildServiceProvider();

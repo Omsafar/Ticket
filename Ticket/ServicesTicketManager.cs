@@ -12,6 +12,7 @@ namespace TicketingApp.Services
     {
         private readonly GraphMailReader _mailReader;
         private readonly TicketRepository _repo;
+        private readonly GraphMailSender _mailSender;
         private DateTimeOffset _lastSync;
 
         public bool CanSync { get; set; } = true;
@@ -22,10 +23,11 @@ namespace TicketingApp.Services
 
         public void NotifyTicketsChanged() => TicketsSynced?.Invoke();
 
-        public TicketManager(GraphMailReader mailReader, TicketRepository repo)
+        public TicketManager(GraphMailReader mailReader, TicketRepository repo, GraphMailSender mailSender)
         {
             _mailReader = mailReader;
             _repo = repo;
+            _mailSender = mailSender;
             // All'avvio leggiamo tutta la casella
             _lastSync = DateTimeOffset.MinValue;
         }
@@ -56,6 +58,11 @@ namespace TicketingApp.Services
                 };
 
                 await _repo.CreateAsync(ticket);
+                await _mailSender.SendTicketCreatedNotificationAsync(
+                "support.ticket@paratorispa.it",
+                ticket.MittenteEmail,
+                ticket.TicketId,
+                ticket.Oggetto);
             }
             _lastSync = DateTimeOffset.UtcNow;
 
