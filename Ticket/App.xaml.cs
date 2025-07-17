@@ -1,4 +1,4 @@
-﻿// App.xaml.cs
+﻿// App.xaml.cs/
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
