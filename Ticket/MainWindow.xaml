@@ -18,6 +18,11 @@
                 Click="NewTicketButton_Click"
                 DockPanel.Dock="Top"
                 Margin="5"/>
+        <Button x:Name="ClosedTicketsButton"
+                Content="Ticket chiusi"
+                Click="ClosedTicketsButton_Click"
+                DockPanel.Dock="Top"
+                Margin="5"/>
         <Button x:Name="RefreshButton"
                 Content="Aggiorna"
                 Click="RefreshButton_Click"

@@ -10,6 +10,8 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using TicketingApp.Graph;
 using System.Threading;
+using Microsoft.EntityFrameworkCore;
+using TicketingApp.Services;
 
 namespace TicketingApp
 {
@@ -41,13 +43,14 @@ namespace TicketingApp
             };
 
             SyncButton.Visibility = _isAdmin ? Visibility.Visible : Visibility.Collapsed;
+            ClosedTicketsButton.Content = _isAdmin ? "Ticket chiusi" : "I miei ticket chiusi";
             NewTicketButton.Visibility = _isAdmin ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void LoadTickets()
         {
             Tickets.Clear();
-            var query = _repo.GetAll();
+            var query = _repo.GetAll().Where(t => !EF.Functions.Like(t.Stato, "Chiuso"));
             if (!_isAdmin)
                 query = query.Where(t => t.MittenteEmail == _currentEmail);
             foreach (var t in query.OrderByDescending(t => t.TicketId))
@@ -92,9 +95,19 @@ namespace TicketingApp
             }
             else if (e.PropertyName == "Corpo" && e.Column is DataGridTextColumn textCol)
             {
-                var style = new Style(typeof(TextBlock));
-                style.Setters.Add(new Setter(TextBlock.TextWrappingProperty, TextWrapping.Wrap));
-                textCol.ElementStyle = style;
+                textCol.ElementStyle = new Style(typeof(TextBlock))
+                {
+                    Setters = { new Setter(TextBlock.TextWrappingProperty, TextWrapping.Wrap) }
+                };
+                textCol.EditingElementStyle = new Style(typeof(TextBox))
+                {
+                    Setters =
+                    {
+                        new Setter(TextBox.TextWrappingProperty, TextWrapping.Wrap),
+                        new Setter(TextBox.AcceptsReturnProperty, true)
+                    }
+                };
+                textCol.Width = new DataGridLength(1, DataGridLengthUnitType.Star);
             }
         }
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
@@ -117,6 +130,11 @@ namespace TicketingApp
                     win.Corpo);
                 LoadTickets();
             }
+        }
+        private void ClosedTicketsButton_Click(object sender, RoutedEventArgs e)
+        {
+            var win = new ClosedTicketsWindow(_repo, _manager, _isAdmin, _currentEmail);
+            win.Show();
         }
     }
 }

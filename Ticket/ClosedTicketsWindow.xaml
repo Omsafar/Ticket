@@ -1,0 +1,20 @@
+﻿<Window x:Class="TicketingApp.ClosedTicketsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Ticket Chiusi" Height="450" Width="800">
+    <DockPanel>
+        <Button x:Name="RefreshButton"
+                Content="Aggiorna"
+                Click="RefreshButton_Click"
+                DockPanel.Dock="Top"
+                Margin="5"/>
+        <DataGrid x:Name="TicketGrid"
+                  ItemsSource="{Binding Tickets}"
+                  AutoGenerateColumns="True"
+                  AutoGeneratingColumn="TicketGrid_AutoGeneratingColumn"
+                  IsReadOnly="True"
+                  EnableRowVirtualization="True"
+                  EnableColumnVirtualization="True"
+                  VirtualizingPanel.ScrollUnit="Pixel"/>
+    </DockPanel>
+</Window>
