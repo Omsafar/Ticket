@@ -44,6 +44,13 @@ namespace TicketingApp.Services
             _lastSync = DateTimeOffset.MinValue;
         }
 
+        public async Task SendTicketReopenedNotificationAsync(string toAddress, int ticketId)
+        {
+            await _mailSender.SendTicketReopenedNotificationAsync(
+                "support.ticket@paratorispa.it",
+                toAddress,
+                ticketId);
+        }
         public async Task SyncAsync(CancellationToken ct)
         {
             if (!CanSync)
@@ -70,6 +77,14 @@ namespace TicketingApp.Services
                             HtmlUtils.ToPlainText(msg.Body?.Content));
                         continue;
                     }
+                }
+                var anyTicket = await _repo.FindByIdAsync(ticketId);
+                if (anyTicket != null && string.Equals(anyTicket.Stato, "Chiuso", StringComparison.OrdinalIgnoreCase))
+                {
+                    await _mailSender.SendTicketClosedInfoAsync(
+                        "support.ticket@paratorispa.it",
+                        msg.From?.EmailAddress?.Address ?? "unknown",
+                        anyTicket.TicketId);
                 }
 
                 var existing = await _repo.FindByConversationIdAsync(convId);

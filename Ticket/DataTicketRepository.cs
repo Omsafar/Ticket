@@ -33,6 +33,11 @@ namespace TicketingApp.Data
             return await _ctx.Tickets.FirstOrDefaultAsync(t => t.TicketId == ticketId && !EF.Functions.Like(t.Stato, "Chiuso"));
         }
 
+        public async Task<Ticket?> FindByIdAsync(int ticketId)
+        {
+            return await _ctx.Tickets.FindAsync(ticketId);
+        }
+
         public async Task AppendMessageAsync(int ticketId, DateTime receivedDate, string body)
         {
             var ticket = await _ctx.Tickets.FindAsync(ticketId);
@@ -46,15 +51,17 @@ namespace TicketingApp.Data
 
         public IQueryable<Ticket> GetAll() => _ctx.Tickets.AsNoTracking();
 
-        public async Task UpdateStatusAsync(int ticketId, string newStatus)
+        public async Task<string?> UpdateStatusAsync(int ticketId, string newStatus)
         {
             var ticket = await _ctx.Tickets.FindAsync(ticketId);
             if (ticket == null)
-                return;
+                return null;
 
+            var oldStatus = ticket.Stato;
             ticket.Stato = newStatus;
             ticket.DataUltimaModifica = DateTime.UtcNow;
             await _ctx.SaveChangesAsync();
+            return oldStatus;
         }
     }
 }

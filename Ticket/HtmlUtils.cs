@@ -1,5 +1,6 @@
 using HtmlAgilityPack;
 using System.Xml;
+using System.Linq;
 
 namespace TicketingApp
 {
@@ -12,6 +13,19 @@ namespace TicketingApp
 
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
+
+            var tags = new[] { "br", "p", "div", "li" };
+            foreach (var tag in tags)
+            {
+                var nodes = doc.DocumentNode.SelectNodes($"//{tag}");
+                if (nodes == null)
+                    continue;
+                foreach (var n in nodes)
+                {
+                    n.ParentNode.InsertBefore(doc.CreateTextNode("\n"), n);
+                }
+            }
+
             return HtmlEntity.DeEntitize(doc.DocumentNode.InnerText);
         }
     }
