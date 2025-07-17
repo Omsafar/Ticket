@@ -66,13 +66,16 @@ namespace TicketingApp
             {
                 if (e.Row.Item is Ticket ticket)
                 {
-                    var oldStatus = await _repo.UpdateStatusAsync(ticket.TicketId, ticket.Stato);
-                    _manager.NotifyTicketsChanged();
-                    if (string.Equals(oldStatus, "Chiuso", StringComparison.OrdinalIgnoreCase) &&
-                        !string.Equals(ticket.Stato, "Chiuso", StringComparison.OrdinalIgnoreCase))
+                    var oldState = await _repo.GetStateAsync(ticket.TicketId);
+                    if (string.Equals(oldState, "Chiuso", StringComparison.OrdinalIgnoreCase) &&
+                        string.Equals(ticket.Stato, "Aperto", StringComparison.OrdinalIgnoreCase))
                     {
+                        await _repo.UpdateAsync(ticket);
+                        LoadTickets();
                         await _manager.SendTicketReopenedNotificationAsync(ticket.MittenteEmail, ticket.TicketId);
+                        return;
                     }
+                    await _repo.UpdateStatusAsync(ticket.TicketId, ticket.Stato);
                     _manager.NotifyTicketsChanged();
                 }
             }

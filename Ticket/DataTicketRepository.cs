@@ -20,7 +20,15 @@ namespace TicketingApp.Data
         {
             _ctx.Tickets.Add(ticket);
             await _ctx.SaveChangesAsync();
+            _ctx.Entry(ticket).State = EntityState.Detached;
             return ticket;
+        }
+
+        public async Task UpdateAsync(Ticket ticket)
+        {
+            _ctx.Entry(ticket).State = EntityState.Modified;
+            await _ctx.SaveChangesAsync();
+            _ctx.Entry(ticket).State = EntityState.Detached;
         }
 
         public async Task<Ticket?> FindByConversationIdAsync(string conversationId)
@@ -62,6 +70,15 @@ namespace TicketingApp.Data
             ticket.DataUltimaModifica = DateTime.UtcNow;
             await _ctx.SaveChangesAsync();
             return oldStatus;
+        }
+
+        public async Task<string?> GetStateAsync(int ticketId)
+        {
+            return await _ctx.Tickets
+                .AsNoTracking()
+                .Where(t => t.TicketId == ticketId)
+                .Select(t => t.Stato)
+                .FirstOrDefaultAsync();
         }
     }
 }

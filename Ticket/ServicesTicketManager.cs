@@ -67,32 +67,20 @@ namespace TicketingApp.Services
                     continue;
 
                 var convId = msg.ConversationId ?? string.Empty;
-                if (TryGetTicketId(msg.Subject, out var ticketId))
-                {
-                    var openTicket = await _repo.FindOpenByIdAsync(ticketId);
-                    if (openTicket != null && openTicket.ConversationId == convId)
-                    {
-                        await _repo.AppendMessageAsync(openTicket.TicketId,
-                            msg.ReceivedDateTime?.UtcDateTime ?? DateTime.UtcNow,
-                            HtmlUtils.ToPlainText(msg.Body?.Content));
-                        continue;
-                    }
-                }
-                var anyTicket = await _repo.FindByIdAsync(ticketId);
-                if (anyTicket != null && string.Equals(anyTicket.Stato, "Chiuso", StringComparison.OrdinalIgnoreCase))
-                {
-                    await _mailSender.SendTicketClosedInfoAsync(
-                        "support.ticket@paratorispa.it",
-                        msg.From?.EmailAddress?.Address ?? "unknown",
-                        anyTicket.TicketId);
-                }
-
                 var existing = await _repo.FindByConversationIdAsync(convId);
                 if (existing != null)
                 {
-                    await _repo.AppendMessageAsync(existing.TicketId,
-                        msg.ReceivedDateTime?.UtcDateTime ?? DateTime.UtcNow,
-                        HtmlUtils.ToPlainText(msg.Body?.Content));
+                    if (string.Equals(existing.Stato, "Chiuso", StringComparison.OrdinalIgnoreCase))
+                    {
+                        await _mailSender.SendTicketClosedInfoAsync(
+                        "support.ticket@paratorispa.it",
+                        msg.From?.EmailAddress?.Address ?? "unknown",
+                        existing.TicketId);
+                        continue;
+                    }
+                    existing.DataUltimaModifica = msg.ReceivedDateTime?.UtcDateTime ?? DateTime.UtcNow;
+                    existing.Corpo += "\n---\n" + HtmlUtils.ToPlainText(msg.Body?.Content);
+                    await _repo.UpdateAsync(existing);
                     continue;
                 }
 
