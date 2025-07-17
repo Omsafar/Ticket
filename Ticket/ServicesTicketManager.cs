@@ -7,13 +7,16 @@ using TicketingApp.Data;
 using TicketingApp.Models;
 using System.Text.RegularExpressions;
 using TicketingApp;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 
 namespace TicketingApp.Services
 {
     public class TicketManager
     {
         private readonly GraphMailReader _mailReader;
-        private readonly TicketRepository _repo;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly GraphMailSender _mailSender;
         private DateTimeOffset _lastSync;
 
@@ -35,10 +38,10 @@ namespace TicketingApp.Services
 
         public void NotifyTicketsChanged() => TicketsSynced?.Invoke();
 
-        public TicketManager(GraphMailReader mailReader, TicketRepository repo, GraphMailSender mailSender)
+        public TicketManager(GraphMailReader mailReader, IServiceScopeFactory scopeFactory, GraphMailSender mailSender)
         {
             _mailReader = mailReader;
-            _repo = repo;
+            _scopeFactory = scopeFactory;
             _mailSender = mailSender;
             // All'avvio leggiamo tutta la casella
             _lastSync = DateTimeOffset.MinValue;
@@ -61,58 +64,109 @@ namespace TicketingApp.Services
 
             var filterEmail = IsAdmin ? null : CurrentUserEmail;
             var newMessages = await _mailReader.GetNewMessagesAsync(_lastSync, filterEmail);
+
+            var tasks = new List<Task>();
             foreach (var msg in newMessages)
             {
                 if (msg.ReceivedDateTime <= _lastSync)
                     continue;
 
-                if (await _repo.FindByGraphMessageIdAsync(msg.Id) != null)
-                continue;
+                tasks.Add(ProcessMessageAsync(msg));
+            }
 
-                var convId = msg.ConversationId ?? string.Empty;
-                var existing = await _repo.FindByConversationIdAsync(convId);
-                if (existing != null)
+            await Task.WhenAll(tasks);
+
+            _lastSync = DateTimeOffset.UtcNow;
+
+            if (newMessages != null && newMessages.Any())
+                TicketsSynced?.Invoke();
+        }
+
+        private static bool IsUniqueViolation(DbUpdateException ex)
+        {
+            return ex.InnerException is SqlException sql && (sql.Number == 2601 || sql.Number == 2627);
+        }
+
+        private async Task ProcessMessageAsync(Microsoft.Graph.Models.Message msg)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var repo = scope.ServiceProvider.GetRequiredService<TicketRepository>();
+            var ctx = scope.ServiceProvider.GetRequiredService<TicketContext>();
+
+            await using var tx = await ctx.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+
+            if (await repo.FindByGraphMessageIdAsync(msg.Id) != null)
+            {
+                await tx.CommitAsync();
+                return;
+            }
+
+            var convId = msg.ConversationId ?? string.Empty;
+            var existing = await repo.FindByConversationIdAsync(convId);
+            if (existing != null)
+            {
+                if (string.Equals(existing.Stato, "Chiuso", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (string.Equals(existing.Stato, "Chiuso", StringComparison.OrdinalIgnoreCase))
-                    {
-                        await _mailSender.SendTicketClosedInfoAsync(
+                    await _mailSender.SendTicketClosedInfoAsync(
                         "support.ticket@paratorispa.it",
                         msg.From?.EmailAddress?.Address ?? "unknown",
                         existing.TicketId);
-                        continue;
-                    }
-                    existing.DataUltimaModifica = msg.ReceivedDateTime?.UtcDateTime ?? DateTime.UtcNow;
-                    existing.Corpo += "\n---\n" + HtmlUtils.ToPlainText(msg.Body?.Content);
-                    await _repo.UpdateAsync(existing);
-                    continue;
+                    await tx.CommitAsync();
+                    return;
                 }
 
-                if (TryGetTicketId(msg.Subject, out var subjectTicketId))
+                existing.DataUltimaModifica = msg.ReceivedDateTime?.UtcDateTime ?? DateTime.UtcNow;
+                existing.Corpo += "\n---\n" + HtmlUtils.ToPlainText(msg.Body?.Content);
+                await repo.UpdateAsync(existing);
+                await tx.CommitAsync();
+                return;
+            }
+
+            if (TryGetTicketId(msg.Subject, out var subjectTicketId))
+            {
+                var byId = await repo.FindByIdAsync(subjectTicketId);
+                if (byId != null && string.Equals(byId.Stato, "Chiuso", StringComparison.OrdinalIgnoreCase))
                 {
-                    var byId = await _repo.FindByIdAsync(subjectTicketId);
-                    if (byId != null && string.Equals(byId.Stato, "Chiuso", StringComparison.OrdinalIgnoreCase))
-                    {
-                        await _mailSender.SendTicketClosedInfoAsync(
-                            "support.ticket@paratorispa.it",
-                            msg.From?.EmailAddress?.Address ?? "unknown",
-                            byId.TicketId);
-                        continue;
-                    }
+                    await _mailSender.SendTicketClosedInfoAsync(
+                        "support.ticket@paratorispa.it",
+                        msg.From?.EmailAddress?.Address ?? "unknown",
+                        byId.TicketId);
+                    await tx.CommitAsync();
+                    return;
                 }
+            }
 
-                var ticket = new Ticket
+            var ticket = new Ticket
+            {
+                GraphMessageId = msg.Id,
+                ConversationId = convId,
+                MittenteEmail = msg.From?.EmailAddress?.Address ?? "unknown",
+                Oggetto = msg.Subject,
+                Corpo = HtmlUtils.ToPlainText(msg.Body?.Content),
+                Stato = "Aperto",
+                DataApertura = msg.ReceivedDateTime?.UtcDateTime ?? DateTime.UtcNow,
+                DataUltimaModifica = msg.ReceivedDateTime?.UtcDateTime ?? DateTime.UtcNow
+            };
+
+            var created = false;
+            try
+            {
+                await repo.CreateAsync(ticket);
+                created = true;
+                await tx.CommitAsync();
+            }
+            catch (DbUpdateException ex) when (IsUniqueViolation(ex))
+            {
+                await tx.RollbackAsync();
+                var other = await repo.FindByGraphMessageIdAsync(msg.Id);
+                if (other != null)
                 {
-                    GraphMessageId = msg.Id,
-                    ConversationId = convId,
-                    MittenteEmail = msg.From?.EmailAddress?.Address ?? "unknown",
-                    Oggetto = msg.Subject,
-                    Corpo = HtmlUtils.ToPlainText(msg.Body?.Content),
-                    Stato = "Aperto",
-                    DataApertura = msg.ReceivedDateTime?.UtcDateTime ?? DateTime.UtcNow,
-                    DataUltimaModifica = msg.ReceivedDateTime?.UtcDateTime ?? DateTime.UtcNow
-                };
+                    ticket = other;
+                }
+            }
 
-                await _repo.CreateAsync(ticket);
+            if (created)
+            {
                 await _mailSender.SendTicketCreatedNotificationAsync(
                     "support.ticket@paratorispa.it",
                     ticket.MittenteEmail,
@@ -120,11 +174,6 @@ namespace TicketingApp.Services
                     ticket.Oggetto,
                     ticket.Corpo);
             }
-            _lastSync = DateTimeOffset.UtcNow;
-
-
-            if (newMessages != null && newMessages.Any())
-                TicketsSynced?.Invoke();
         }
         public async Task<Ticket> CreateManualTicketAsync(string email, string subject, string body)
         {
@@ -140,7 +189,14 @@ namespace TicketingApp.Services
                 DataUltimaModifica = DateTime.UtcNow
             };
 
-            await _repo.CreateAsync(ticket);
+            using var scope = _scopeFactory.CreateScope();
+            var repo = scope.ServiceProvider.GetRequiredService<TicketRepository>();
+            var ctx = scope.ServiceProvider.GetRequiredService<TicketContext>();
+            await using var tx = await ctx.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+
+            await repo.CreateAsync(ticket);
+            await tx.CommitAsync();
+
             await _mailSender.SendTicketCreatedNotificationAsync(
                 "support.ticket@paratorispa.it",
                 ticket.MittenteEmail,
