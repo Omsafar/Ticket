@@ -6,6 +6,7 @@ using TicketingApp.Graph;
 using TicketingApp.Data;
 using TicketingApp.Models;
 using System.Text.RegularExpressions;
+using TicketingApp;
 
 namespace TicketingApp.Services
 {
@@ -66,7 +67,7 @@ namespace TicketingApp.Services
                     {
                         await _repo.AppendMessageAsync(openTicket.TicketId,
                             msg.ReceivedDateTime?.UtcDateTime ?? DateTime.UtcNow,
-                            msg.Body?.Content ?? string.Empty);
+                            HtmlUtils.ToPlainText(msg.Body?.Content));
                         continue;
                     }
                 }
@@ -76,7 +77,7 @@ namespace TicketingApp.Services
                 {
                     await _repo.AppendMessageAsync(existing.TicketId,
                         msg.ReceivedDateTime?.UtcDateTime ?? DateTime.UtcNow,
-                        msg.Body?.Content ?? string.Empty);
+                        HtmlUtils.ToPlainText(msg.Body?.Content));
                     continue;
                 }
 
@@ -86,7 +87,7 @@ namespace TicketingApp.Services
                     ConversationId = convId,
                     MittenteEmail = msg.From?.EmailAddress?.Address ?? "unknown",
                     Oggetto = msg.Subject,
-                    Corpo = msg.Body?.Content ?? string.Empty,
+                    Corpo = HtmlUtils.ToPlainText(msg.Body?.Content),
                     Stato = "Aperto",
                     DataApertura = msg.ReceivedDateTime?.UtcDateTime ?? DateTime.UtcNow,
                     DataUltimaModifica = msg.ReceivedDateTime?.UtcDateTime ?? DateTime.UtcNow
