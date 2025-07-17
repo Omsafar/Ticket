@@ -13,6 +13,11 @@
                 Click="SyncButton_Click"
                 DockPanel.Dock="Top"
                 Margin="5"/>
+        <Button x:Name="NewTicketButton"
+                Content="Nuovo ticket"
+                Click="NewTicketButton_Click"
+                DockPanel.Dock="Top"
+                Margin="5"/>
         <Button x:Name="RefreshButton"
                 Content="Aggiorna"
                 Click="RefreshButton_Click"

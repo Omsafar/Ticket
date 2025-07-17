@@ -1,4 +1,4 @@
-using Microsoft.Graph;
+ï»¿using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -18,15 +18,18 @@ namespace TicketingApp.Graph
             string fromSharedMailbox,
             string toAddress,
             int ticketId,
-            string originalSubject)
+            string originalSubject,
+            string originalBody)
         {
             var mail = new Message
             {
-                Subject = $"TICKET NUMERO {ticketId:D4} – {originalSubject}",
+                Subject = $"TICKET NUMERO {ticketId:D4} Â– {originalSubject}",
                 Body = new ItemBody
                 {
                     ContentType = BodyType.Text,
-                    Content = $"Il tuo ticket [TICKET NUMERO {ticketId:D4}] è stato aperto con successo."
+                    Content =
+                        $"Il tuo ticket [TICKET NUMERO {ticketId:D4}] Ã¨ stato aperto con successo." +
+                        "\n\n"+"Oggetto: " + originalSubject + "\n" + "Corpo del messaggio: "+ originalBody
                 },
                 ToRecipients = new List<Recipient>
                 {

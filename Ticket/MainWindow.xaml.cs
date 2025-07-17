@@ -41,6 +41,7 @@ namespace TicketingApp
             };
 
             SyncButton.Visibility = _isAdmin ? Visibility.Visible : Visibility.Collapsed;
+            NewTicketButton.Visibility = _isAdmin ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void LoadTickets()
@@ -89,6 +90,12 @@ namespace TicketingApp
             {
                 e.Cancel = true;
             }
+            else if (e.PropertyName == "Corpo" && e.Column is DataGridTextColumn textCol)
+            {
+                var style = new Style(typeof(TextBlock));
+                style.Setters.Add(new Setter(TextBlock.TextWrappingProperty, TextWrapping.Wrap));
+                textCol.ElementStyle = style;
+            }
         }
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
@@ -98,6 +105,18 @@ namespace TicketingApp
         private async void SyncButton_Click(object sender, RoutedEventArgs e)
         {
             await _manager.SyncAsync(CancellationToken.None);
+        }
+        private async void NewTicketButton_Click(object sender, RoutedEventArgs e)
+        {
+            var win = new NewTicketWindow();
+            if (win.ShowDialog() == true)
+            {
+                await _manager.CreateManualTicketAsync(
+                    win.MittenteEmail,
+                    win.Oggetto,
+                    win.Corpo);
+                LoadTickets();
+            }
         }
     }
 }

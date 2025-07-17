@@ -98,13 +98,39 @@ namespace TicketingApp.Services
                     "support.ticket@paratorispa.it",
                     ticket.MittenteEmail,
                     ticket.TicketId,
-                    ticket.Oggetto);
+                    ticket.Oggetto,
+                    ticket.Corpo);
             }
             _lastSync = DateTimeOffset.UtcNow;
 
 
             if (newMessages != null && newMessages.Any())
                 TicketsSynced?.Invoke();
+        }
+        public async Task<Ticket> CreateManualTicketAsync(string email, string subject, string body)
+        {
+            var ticket = new Ticket
+            {
+                GraphMessageId = Guid.NewGuid().ToString(),
+                ConversationId = Guid.NewGuid().ToString(),
+                MittenteEmail = email,
+                Oggetto = subject,
+                Corpo = body,
+                Stato = "Aperto",
+                DataApertura = DateTime.UtcNow,
+                DataUltimaModifica = DateTime.UtcNow
+            };
+
+            await _repo.CreateAsync(ticket);
+            await _mailSender.SendTicketCreatedNotificationAsync(
+                "support.ticket@paratorispa.it",
+                ticket.MittenteEmail,
+                ticket.TicketId,
+                ticket.Oggetto,
+                ticket.Corpo);
+
+            NotifyTicketsChanged();
+            return ticket;
         }
     }
 }
