@@ -36,6 +36,9 @@ namespace TicketingApp.Models
         [MaxLength(20)]
         public string Stato { get; set; } = "Aperto"; // default
 
+        [MaxLength(20)]
+        public string? StatoPrecedente { get; set; }
+
         public DateTime DataApertura { get; set; } = DateTime.UtcNow;
         public DateTime DataUltimaModifica { get; set; } = DateTime.UtcNow;
 

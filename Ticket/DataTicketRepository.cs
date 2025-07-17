@@ -26,9 +26,16 @@ namespace TicketingApp.Data
 
         public async Task UpdateAsync(Ticket ticket)
         {
-            _ctx.Entry(ticket).State = EntityState.Modified;
+            var existing = await _ctx.Tickets.FindAsync(ticket.TicketId);
+            if (existing == null)
+                return;
+
+            if (ticket.Stato != existing.Stato)
+                ticket.StatoPrecedente = existing.Stato;
+
+            _ctx.Entry(existing).CurrentValues.SetValues(ticket);
             await _ctx.SaveChangesAsync();
-            _ctx.Entry(ticket).State = EntityState.Detached;
+            _ctx.Entry(existing).State = EntityState.Detached;
         }
 
         public async Task<Ticket?> FindByConversationIdAsync(string conversationId)
@@ -66,6 +73,7 @@ namespace TicketingApp.Data
                 return null;
 
             var oldStatus = ticket.Stato;
+            ticket.StatoPrecedente = oldStatus;
             ticket.Stato = newStatus;
             ticket.DataUltimaModifica = DateTime.UtcNow;
             await _ctx.SaveChangesAsync();

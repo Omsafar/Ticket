@@ -67,6 +67,10 @@ namespace TicketingApp.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<string>("StatoPrecedente")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.HasKey("TicketId");
 
                     b.HasIndex("GraphMessageId")

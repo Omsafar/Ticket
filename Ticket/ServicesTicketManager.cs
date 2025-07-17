@@ -63,8 +63,11 @@ namespace TicketingApp.Services
             var newMessages = await _mailReader.GetNewMessagesAsync(_lastSync, filterEmail);
             foreach (var msg in newMessages)
             {
-                if (await _repo.FindByGraphMessageIdAsync(msg.Id) != null)
+                if (msg.ReceivedDateTime <= _lastSync)
                     continue;
+
+                if (await _repo.FindByGraphMessageIdAsync(msg.Id) != null)
+                continue;
 
                 var convId = msg.ConversationId ?? string.Empty;
                 var existing = await _repo.FindByConversationIdAsync(convId);
@@ -82,6 +85,19 @@ namespace TicketingApp.Services
                     existing.Corpo += "\n---\n" + HtmlUtils.ToPlainText(msg.Body?.Content);
                     await _repo.UpdateAsync(existing);
                     continue;
+                }
+
+                if (TryGetTicketId(msg.Subject, out var subjectTicketId))
+                {
+                    var byId = await _repo.FindByIdAsync(subjectTicketId);
+                    if (byId != null && string.Equals(byId.Stato, "Chiuso", StringComparison.OrdinalIgnoreCase))
+                    {
+                        await _mailSender.SendTicketClosedInfoAsync(
+                            "support.ticket@paratorispa.it",
+                            msg.From?.EmailAddress?.Address ?? "unknown",
+                            byId.TicketId);
+                        continue;
+                    }
                 }
 
                 var ticket = new Ticket
