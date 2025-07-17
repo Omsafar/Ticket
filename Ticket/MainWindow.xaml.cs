@@ -90,6 +90,11 @@ namespace TicketingApp
                 e.Cancel = true;
             }
         }
+        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            LoadTickets();
+        }
+
         private async void SyncButton_Click(object sender, RoutedEventArgs e)
         {
             await _manager.SyncAsync(CancellationToken.None);

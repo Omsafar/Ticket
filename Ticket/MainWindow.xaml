@@ -12,7 +12,13 @@
                 Content="Controlla nuovi ticket"
                 Click="SyncButton_Click"
                 DockPanel.Dock="Top"
-                Margin="5"/>        <DataGrid x:Name="TicketGrid"
+                Margin="5"/>
+        <Button x:Name="RefreshButton"
+                Content="Aggiorna"
+                Click="RefreshButton_Click"
+                DockPanel.Dock="Top"
+                Margin="5"/>
+        <DataGrid x:Name="TicketGrid"
                   ItemsSource="{Binding Tickets}"
                   AutoGenerateColumns="True"
                   AutoGeneratingColumn="TicketGrid_AutoGeneratingColumn"

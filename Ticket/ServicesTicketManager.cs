@@ -5,6 +5,7 @@ using System.Linq;
 using TicketingApp.Graph;
 using TicketingApp.Data;
 using TicketingApp.Models;
+using System.Text.RegularExpressions;
 
 namespace TicketingApp.Services
 {
@@ -14,6 +15,16 @@ namespace TicketingApp.Services
         private readonly TicketRepository _repo;
         private readonly GraphMailSender _mailSender;
         private DateTimeOffset _lastSync;
+
+        private static bool TryGetTicketId(string? subject, out int ticketId)
+        {
+            ticketId = 0;
+            if (string.IsNullOrEmpty(subject))
+                return false;
+
+            var match = Regex.Match(subject, @"TICKET\s+NUMERO\s*(\d+)", RegexOptions.IgnoreCase);
+            return match.Success && int.TryParse(match.Groups[1].Value, out ticketId);
+        }
 
         public bool CanSync { get; set; } = true;
         public string CurrentUserEmail { get; set; } = string.Empty;
@@ -48,6 +59,18 @@ namespace TicketingApp.Services
                     continue;
 
                 var convId = msg.ConversationId ?? string.Empty;
+                if (TryGetTicketId(msg.Subject, out var ticketId))
+                {
+                    var openTicket = await _repo.FindOpenByIdAsync(ticketId);
+                    if (openTicket != null && openTicket.ConversationId == convId)
+                    {
+                        await _repo.AppendMessageAsync(openTicket.TicketId,
+                            msg.ReceivedDateTime?.UtcDateTime ?? DateTime.UtcNow,
+                            msg.Body?.Content ?? string.Empty);
+                        continue;
+                    }
+                }
+
                 var existing = await _repo.FindByConversationIdAsync(convId);
                 if (existing != null)
                 {

@@ -28,6 +28,11 @@ namespace TicketingApp.Data
             return await _ctx.Tickets.FirstOrDefaultAsync(t => t.ConversationId == conversationId);
         }
 
+        public async Task<Ticket?> FindOpenByIdAsync(int ticketId)
+        {
+            return await _ctx.Tickets.FirstOrDefaultAsync(t => t.TicketId == ticketId && !EF.Functions.Like(t.Stato, "Chiuso"));
+        }
+
         public async Task AppendMessageAsync(int ticketId, DateTime receivedDate, string body)
         {
             var ticket = await _ctx.Tickets.FindAsync(ticketId);
