@@ -11,14 +11,18 @@ namespace TicketingApp.Graph
     {
         private readonly GraphServiceClient _client;
         private readonly string _sharedMailboxAddress;
+        private readonly string _risposteFolderId;
 
-        public GraphMailReader(string sharedMailboxAddress)
+        public GraphMailReader(string sharedMailboxAddress, string risposteFolderId)
         {
             _client = GraphAuthProvider.GraphClient;
             _sharedMailboxAddress = sharedMailboxAddress;
+            _risposteFolderId = risposteFolderId;
         }
 
-        public async Task<IEnumerable<Message>> GetNewMessagesAsync(DateTimeOffset since, string? fromEmail = null, string folderName = "Inbox")
+        public string RisposteFolderId => _risposteFolderId;
+
+        public async Task<IEnumerable<Message>> GetNewMessagesAsync(DateTimeOffset since, string? fromEmail = null, string folderId = "Inbox")
         {
             // Filtro: ricevute dopo `since`, solo Inbox.
             var filter = $"receivedDateTime ge {since.UtcDateTime:o}";
@@ -30,7 +34,7 @@ namespace TicketingApp.Graph
 
             var messages = await _client
                 .Users[_sharedMailboxAddress]
-                .MailFolders[folderName]
+                .MailFolders[folderId]
                 .Messages
                 .GetAsync(req =>
                 {

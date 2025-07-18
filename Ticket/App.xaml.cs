@@ -25,7 +25,9 @@ namespace TicketingApp
             services.AddScoped<TicketRepository>();
 
             // 3) GraphMailReader
-            services.AddSingleton(s => new GraphMailReader("support.ticket@paratorispa.it"));
+            services.AddSingleton(s => new GraphMailReader(
+                "support.ticket@paratorispa.it",
+                GraphSettings.RisposteFolderId));
 
             // 4) GraphMailSender
             services.AddSingleton<GraphMailSender>();

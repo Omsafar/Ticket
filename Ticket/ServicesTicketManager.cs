@@ -102,7 +102,7 @@ namespace TicketingApp.Services
                     ticket.Corpo);
             }
 
-            var responseMessages = await _mailReader.GetNewMessagesAsync(_lastSync, filterEmail, "Risposte");
+            var responseMessages = await _mailReader.GetNewMessagesAsync(_lastSync, filterEmail, _mailReader.RisposteFolderId);
             foreach (var msg in responseMessages)
             {
                 if (!TryGetTicketId(msg.Subject, out var ticketId))
