@@ -18,7 +18,7 @@ namespace TicketingApp.Graph
             _sharedMailboxAddress = sharedMailboxAddress;
         }
 
-        public async Task<IEnumerable<Message>> GetNewMessagesAsync(DateTimeOffset since, string? fromEmail = null)
+        public async Task<IEnumerable<Message>> GetNewMessagesAsync(DateTimeOffset since, string? fromEmail = null, string folderName = "Inbox")
         {
             // Filtro: ricevute dopo `since`, solo Inbox.
             var filter = $"receivedDateTime ge {since.UtcDateTime:o}";
@@ -30,7 +30,7 @@ namespace TicketingApp.Graph
 
             var messages = await _client
                 .Users[_sharedMailboxAddress]
-                .MailFolders["Inbox"]
+                .MailFolders[folderName]
                 .Messages
                 .GetAsync(req =>
                 {

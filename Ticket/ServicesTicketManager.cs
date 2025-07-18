@@ -101,10 +101,24 @@ namespace TicketingApp.Services
                     ticket.Oggetto,
                     ticket.Corpo);
             }
+
+            var responseMessages = await _mailReader.GetNewMessagesAsync(_lastSync, filterEmail, "Risposte");
+            foreach (var msg in responseMessages)
+            {
+                if (!TryGetTicketId(msg.Subject, out var ticketId))
+                    continue;
+
+                var status = await _repo.GetStatusAsync(ticketId);
+                if (status != null && string.Equals(status, "Chiuso", StringComparison.OrdinalIgnoreCase))
+                {
+                    var from = msg.From?.EmailAddress?.Address ?? "unknown";
+                    await _mailSender.SendTicketClosedInfoAsync("support.ticket@paratorispa.it", from, ticketId);
+                }
+            }
             _lastSync = DateTimeOffset.UtcNow;
 
 
-            if (newMessages != null && newMessages.Any())
+            if ((newMessages != null && newMessages.Any()) || (responseMessages != null && responseMessages.Any()))
                 TicketsSynced?.Invoke();
         }
         public async Task<Ticket> CreateManualTicketAsync(string email, string subject, string body)

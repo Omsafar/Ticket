@@ -43,6 +43,11 @@ namespace TicketingApp.Data
             ticket.Corpo += "\n---\n" + body;
             await _ctx.SaveChangesAsync();
         }
+        public async Task<string?> GetStatusAsync(int ticketId)
+        {
+            var ticket = await _ctx.Tickets.AsNoTracking().FirstOrDefaultAsync(t => t.TicketId == ticketId);
+            return ticket?.Stato;
+        }
 
         public IQueryable<Ticket> GetAll() => _ctx.Tickets.AsNoTracking();
 
