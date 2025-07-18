@@ -47,5 +47,34 @@ namespace TicketingApp.Graph
                  .SendMail
                 .PostAsync(requestBody);
         }
+        public async Task SendTicketReopenedNotificationAsync(
+           string fromSharedMailbox,
+           string toAddress,
+           int ticketId)
+        {
+            var mail = new Message
+            {
+                Subject = $"TICKET NUMERO {ticketId:D4} riaperto",
+                Body = new ItemBody
+                {
+                    ContentType = BodyType.Text,
+                    Content = $"Il tuo ticket [TICKET NUMERO {ticketId:D4}] è stato riaperto."
+                },
+                ToRecipients = new List<Recipient>
+                {
+                    new Recipient { EmailAddress = new EmailAddress { Address = toAddress } }
+                }
+            };
+            var requestBody = new Microsoft.Graph.Users.Item.SendMail.SendMailPostRequestBody
+            {
+                Message = mail,
+                SaveToSentItems = true
+            };
+
+            await _graph
+                .Users[fromSharedMailbox]
+                .SendMail
+                .PostAsync(requestBody);
+        }
     }
 }
