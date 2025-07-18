@@ -34,9 +34,11 @@
                   AutoGenerateColumns="True"
                   AutoGeneratingColumn="TicketGrid_AutoGeneratingColumn"
                   CellEditEnding="TicketGrid_CellEditEnding"
+                  IsReadOnly="True"
                   SelectionUnit="Cell"
                   EnableRowVirtualization="True"
                   EnableColumnVirtualization="True"
-                  VirtualizingPanel.ScrollUnit="Pixel"/>
+                  VirtualizingPanel.ScrollUnit="Pixel"
+                  ColumnWidth="SizeToCells"/>
     </Grid>
 </Window>

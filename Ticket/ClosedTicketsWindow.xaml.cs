@@ -65,7 +65,7 @@ namespace TicketingApp
                 {
                     Setters = { new Setter(TextBlock.TextWrappingProperty, TextWrapping.Wrap) }
                 };
-                textCol.Width = new DataGridLength(1, DataGridLengthUnitType.Star);
+                textCol.Width = DataGridLength.Auto;
             }
             else if (e.PropertyName == "Stato" && _isAdmin && e.Column is DataGridTextColumn statoCol)
             {

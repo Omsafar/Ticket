@@ -20,6 +20,7 @@
                   IsReadOnly="True"
                   EnableRowVirtualization="True"
                   EnableColumnVirtualization="True"
-                  VirtualizingPanel.ScrollUnit="Pixel"/>
+                  VirtualizingPanel.ScrollUnit="Pixel"
+                  ColumnWidth="SizeToCells"/>
     </Grid>
 </Window>

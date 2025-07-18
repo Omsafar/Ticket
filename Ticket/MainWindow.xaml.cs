@@ -100,15 +100,12 @@ namespace TicketingApp
                 {
                     Setters = { new Setter(TextBlock.TextWrappingProperty, TextWrapping.Wrap) }
                 };
-                textCol.EditingElementStyle = new Style(typeof(TextBox))
-                {
-                    Setters =
-                    {
-                        new Setter(TextBox.TextWrappingProperty, TextWrapping.Wrap),
-                        new Setter(TextBox.AcceptsReturnProperty, true)
-                    }
-                };
-                textCol.Width = new DataGridLength(1, DataGridLengthUnitType.Star);
+                textCol.IsReadOnly = true;
+                textCol.Width = DataGridLength.Auto;
+            }
+            else
+            {
+                e.Column.IsReadOnly = true;
             }
         }
         private async void RefreshButton_Click(object sender, RoutedEventArgs e)
