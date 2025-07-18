@@ -6,29 +6,30 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TicketingApp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <DockPanel>
-        <Button x:Name="SyncButton"
-                Content="Controlla nuovi ticket"
-                Click="SyncButton_Click"
-                DockPanel.Dock="Top"
-                Margin="5"/>
-        <Button x:Name="NewTicketButton"
-                Content="Nuovo ticket"
-                Click="NewTicketButton_Click"
-                DockPanel.Dock="Top"
-                Margin="5"/>
-        <Button x:Name="ClosedTicketsButton"
-                Content="Ticket chiusi"
-                Click="ClosedTicketsButton_Click"
-                DockPanel.Dock="Top"
-                Margin="5"/>
-        <Button x:Name="RefreshButton"
-                Content="Aggiorna"
-                Click="RefreshButton_Click"
-                DockPanel.Dock="Top"
-                Margin="5"/>
+        Title="Gestione Ticket" Height="450" Width="800">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Left">
+            <Button x:Name="SyncButton"
+                    Content="Controlla nuovi ticket"
+                    Click="SyncButton_Click"/>
+            <Button x:Name="NewTicketButton"
+                    Content="Nuovo ticket"
+                    Click="NewTicketButton_Click"/>
+            <Button x:Name="ClosedTicketsButton"
+                    Content="Ticket chiusi"
+                    Click="ClosedTicketsButton_Click"/>
+            <Button x:Name="RefreshButton"
+                    Content="Aggiorna"
+                    Click="RefreshButton_Click"/>
+        </StackPanel>
+
         <DataGrid x:Name="TicketGrid"
+                  Grid.Row="1"
                   ItemsSource="{Binding Tickets}"
                   AutoGenerateColumns="True"
                   AutoGeneratingColumn="TicketGrid_AutoGeneratingColumn"
@@ -37,5 +38,5 @@
                   EnableRowVirtualization="True"
                   EnableColumnVirtualization="True"
                   VirtualizingPanel.ScrollUnit="Pixel"/>
-    </DockPanel>
+    </Grid>
 </Window>
