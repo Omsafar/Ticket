@@ -89,7 +89,7 @@ namespace TicketingApp.Services
                 if (existing != null)
                 {
                     await _repo.AppendMessageAsync(existing.TicketId,
-                        msg.ReceivedDateTime?.UtcDateTime ?? DateTime.UtcNow,
+                        msg.ReceivedDateTime?.LocalDateTime ?? DateTime.Now,
                         HtmlUtils.ToPlainText(msg.Body?.Content));
                     continue;
                 }
@@ -102,8 +102,8 @@ namespace TicketingApp.Services
                     Oggetto = msg.Subject,
                     Corpo = HtmlUtils.ToPlainText(msg.Body?.Content),
                     Stato = "Aperto",
-                    DataApertura = msg.ReceivedDateTime?.UtcDateTime ?? DateTime.UtcNow,
-                    DataUltimaModifica = msg.ReceivedDateTime?.UtcDateTime ?? DateTime.UtcNow
+                    DataApertura = msg.ReceivedDateTime?.LocalDateTime ?? DateTime.Now,
+                    DataUltimaModifica = msg.ReceivedDateTime?.LocalDateTime ?? DateTime.Now
                 };
 
                 await _repo.CreateAsync(ticket);
@@ -130,8 +130,8 @@ namespace TicketingApp.Services
                 Oggetto = subject,
                 Corpo = body,
                 Stato = "Aperto",
-                DataApertura = DateTime.UtcNow,
-                DataUltimaModifica = DateTime.UtcNow
+                DataApertura = DateTime.Now,
+                DataUltimaModifica = DateTime.Now
             };
 
             await _repo.CreateAsync(ticket);

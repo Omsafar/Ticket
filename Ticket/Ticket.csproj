@@ -7,10 +7,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
 	  <RootNamespace>TicketingApp</RootNamespace>
+	  <ApplicationIcon>IconaTicket.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Include=".github\workflows\build.yml" />
+    <Content Include="IconaTicket.ico" />
   </ItemGroup>
 
   <ItemGroup>

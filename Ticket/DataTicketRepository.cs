@@ -57,7 +57,7 @@ namespace TicketingApp.Data
                 return;
 
             ticket.Stato = newStatus;
-            ticket.DataUltimaModifica = DateTime.UtcNow;
+            ticket.DataUltimaModifica = DateTime.Now;
             await _ctx.SaveChangesAsync();
         }
     }
