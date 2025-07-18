@@ -39,6 +39,6 @@
                   EnableRowVirtualization="True"
                   EnableColumnVirtualization="True"
                   VirtualizingPanel.ScrollUnit="Pixel"
-                  ColumnWidth="*"/>
+                                    ColumnWidth="Auto"/>
     </Grid>
 </Window>
