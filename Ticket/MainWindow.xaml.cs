@@ -13,6 +13,7 @@ using System.Threading;
 using Microsoft.EntityFrameworkCore;
 using TicketingApp.Services;
 
+
 namespace TicketingApp
 {
     public partial class MainWindow : Window
@@ -110,8 +111,10 @@ namespace TicketingApp
                 textCol.Width = new DataGridLength(1, DataGridLengthUnitType.Star);
             }
         }
-        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+        private async void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_isAdmin)
+                await _manager.SyncAsync(CancellationToken.None);
             LoadTickets();
         }
 

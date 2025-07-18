@@ -9,6 +9,7 @@ using TicketingApp.Models;
 using TicketingApp.Services;
 using System.Windows.Input;
 using TicketingApp.Graph;
+using System.Threading;
 
 namespace TicketingApp
 {
@@ -45,8 +46,10 @@ namespace TicketingApp
                 Tickets.Add(t);
         }
 
-        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+        private async void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_isAdmin)
+                await _manager.SyncAsync(System.Threading.CancellationToken.None);
             LoadTickets();
         }
 

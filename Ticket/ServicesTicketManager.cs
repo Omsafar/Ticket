@@ -62,13 +62,26 @@ namespace TicketingApp.Services
                 var convId = msg.ConversationId ?? string.Empty;
                 if (TryGetTicketId(msg.Subject, out var ticketId))
                 {
-                    var openTicket = await _repo.FindOpenByIdAsync(ticketId);
-                    if (openTicket != null && openTicket.ConversationId == convId)
+                    var ticket = await _repo.FindByIdAsync(ticketId);
+                    if (ticket != null)
                     {
-                        await _repo.AppendMessageAsync(openTicket.TicketId,
-                            msg.ReceivedDateTime?.UtcDateTime ?? DateTime.UtcNow,
-                            HtmlUtils.ToPlainText(msg.Body?.Content));
-                        continue;
+                        if (string.Equals(ticket.Stato, "Chiuso", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var toAddress = msg.From?.EmailAddress?.Address ?? "unknown";
+                            await _mailSender.SendTicketClosedAutoReplyAsync(
+                                "support.ticket@paratorispa.it",
+                                toAddress,
+                                ticket.TicketId);
+                            continue;
+                        }
+
+                        if (ticket.ConversationId == convId)
+                        {
+                            await _repo.AppendMessageAsync(ticket.TicketId,
+                                msg.ReceivedDateTime?.UtcDateTime ?? DateTime.UtcNow,
+                                HtmlUtils.ToPlainText(msg.Body?.Content));
+                            continue;
+                        }
                     }
                 }
 
