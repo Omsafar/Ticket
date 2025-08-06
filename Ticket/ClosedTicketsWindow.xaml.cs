@@ -55,9 +55,22 @@ namespace TicketingApp
 
         private void TicketGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
         {
-            if (e.PropertyName == "GraphMessageId")
+            if (e.PropertyName == "GraphMessageId" ||
+                e.PropertyName == "GestoreEmail" ||
+                (e.PropertyName == "ConversationId" && !_isAdmin))
             {
                 e.Cancel = true;
+            }
+            else if (e.PropertyName == "Stato")
+            {
+                e.Column.DisplayIndex = 4;
+                if (_isAdmin && e.Column is DataGridTextColumn statoCol)
+                {
+                    var style = new Style(typeof(DataGridCell));
+                    style.Setters.Add(new Setter(DataGridCell.ContextMenuProperty, BuildUnlockMenu()));
+                    style.Setters.Add(new EventSetter(DataGridCell.MouseLeftButtonUpEvent, new MouseButtonEventHandler(StatusCell_Click)));
+                    statoCol.CellStyle = style;
+                }
             }
             else if (e.PropertyName == "Corpo" && e.Column is DataGridTextColumn textCol)
             {
@@ -66,13 +79,6 @@ namespace TicketingApp
                     Setters = { new Setter(TextBlock.TextWrappingProperty, TextWrapping.Wrap) }
                 };
                 textCol.Width = DataGridLength.Auto;
-            }
-            else if (e.PropertyName == "Stato" && _isAdmin && e.Column is DataGridTextColumn statoCol)
-            {
-                var style = new Style(typeof(DataGridCell));
-                style.Setters.Add(new Setter(DataGridCell.ContextMenuProperty, BuildUnlockMenu()));
-                style.Setters.Add(new EventSetter(DataGridCell.MouseLeftButtonUpEvent, new MouseButtonEventHandler(StatusCell_Click)));
-                statoCol.CellStyle = style;
             }
         }
 
