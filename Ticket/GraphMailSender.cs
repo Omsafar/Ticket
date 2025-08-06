@@ -1,5 +1,6 @@
 ﻿using Microsoft.Graph;
 using Microsoft.Graph.Models;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -19,7 +20,8 @@ namespace TicketingApp.Graph
             string toAddress,
             int ticketId,
             string originalSubject,
-            string originalBody)
+            string originalBody,
+            IEnumerable<string>? ccAddresses = null)
         {
             var mail = new Message
             {
@@ -34,7 +36,11 @@ namespace TicketingApp.Graph
                 ToRecipients = new List<Recipient>
                 {
                     new Recipient { EmailAddress = new EmailAddress { Address = toAddress } }
-                }
+                },
+                CcRecipients = ccAddresses?.Select(a => new Recipient
+                {
+                    EmailAddress = new EmailAddress { Address = a }
+                }).ToList()
             };
             var requestBody = new Microsoft.Graph.Users.Item.SendMail.SendMailPostRequestBody
             {

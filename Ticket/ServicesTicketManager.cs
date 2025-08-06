@@ -107,12 +107,18 @@ namespace TicketingApp.Services
                 };
 
                 await _repo.CreateAsync(ticket);
+                var ccAddresses = msg.CcRecipients?
+                    .Select(r => r.EmailAddress?.Address)
+                    .Where(a => !string.IsNullOrWhiteSpace(a))
+                    .Select(a => a!)
+                    .ToList();
                 await _mailSender.SendTicketCreatedNotificationAsync(
                     "support.ticket@paratorispa.it",
                     ticket.MittenteEmail,
                     ticket.TicketId,
                     ticket.Oggetto,
-                    ticket.Corpo);
+                    ticket.Corpo,
+                    ccAddresses);
             }
             _lastSync = DateTimeOffset.UtcNow;
 
