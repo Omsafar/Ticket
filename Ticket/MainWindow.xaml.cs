@@ -86,11 +86,14 @@ namespace TicketingApp
                         Mode = BindingMode.TwoWay,
                         UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
                     },
-                    IsReadOnly = !_isAdmin
+                    IsReadOnly = !_isAdmin,
+                    DisplayIndex = 4
                 };
                 e.Column = col;
             }
-            else if (e.PropertyName == "GraphMessageId")
+            else if (e.PropertyName == "GraphMessageId" ||
+                     e.PropertyName == "GestoreEmail" ||
+                     (e.PropertyName == "ConversationId" && !_isAdmin))
             {
                 e.Cancel = true;
             }
