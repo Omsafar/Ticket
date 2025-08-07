@@ -13,7 +13,8 @@ using System.Threading;
 using Microsoft.EntityFrameworkCore;
 using TicketingApp.Services;
 using MaterialDesignThemes.Wpf;
-
+using DataGridComboBoxColumn = System.Windows.Controls.DataGridComboBoxColumn;
+using DataGridTextColumn = System.Windows.Controls.DataGridTextColumn;
 
 namespace TicketingApp
 {
@@ -156,8 +157,8 @@ namespace TicketingApp
         private void SetBaseTheme(bool isDark)
         {
             _isDarkTheme = isDark;
-            ITheme theme = _paletteHelper.GetTheme();
-            theme.SetBaseTheme(isDark ? Theme.Dark : Theme.Light);
+            var theme = _paletteHelper.GetTheme();
+            theme.SetBaseTheme(isDark ? BaseTheme.Dark : BaseTheme.Light);
             _paletteHelper.SetTheme(theme);
         }
     }
