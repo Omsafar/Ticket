@@ -12,6 +12,7 @@ using TicketingApp.Graph;
 using System.Threading;
 using Microsoft.EntityFrameworkCore;
 using TicketingApp.Services;
+using MaterialDesignThemes.Wpf;
 
 
 namespace TicketingApp
@@ -24,6 +25,8 @@ namespace TicketingApp
         private readonly string _currentEmail;
         private readonly TicketRepository _repo;
         private readonly Services.TicketManager _manager;
+        private readonly PaletteHelper _paletteHelper = new();
+        private bool _isDarkTheme;
 
         public MainWindow(TicketRepository repo, Services.TicketManager manager)
         {
@@ -138,6 +141,25 @@ namespace TicketingApp
         {
             var win = new ClosedTicketsWindow(_repo, _manager, _isAdmin, _currentEmail);
             win.Show();
+        }
+
+
+        private void ThemeToggleButton_Checked(object sender, RoutedEventArgs e)
+        {
+            SetBaseTheme(true);
+        }
+
+        private void ThemeToggleButton_Unchecked(object sender, RoutedEventArgs e)
+        {
+            SetBaseTheme(false);
+        }
+
+        private void SetBaseTheme(bool isDark)
+        {
+            _isDarkTheme = isDark;
+            ITheme theme = _paletteHelper.GetTheme();
+            theme.SetBaseTheme(isDark ? Theme.Dark : Theme.Light);
+            _paletteHelper.SetTheme(theme);
         }
     }
 }

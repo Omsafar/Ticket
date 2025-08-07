@@ -5,7 +5,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TicketingApp"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
         Title="Gestione Ticket" Height="450" Width="800">
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -26,6 +29,14 @@
             <Button x:Name="RefreshButton"
                     Content="Aggiorna"
                     Click="RefreshButton_Click"/>
+            <TextBox Width="200" Margin="5"/>
+            <ToggleButton x:Name="ThemeToggleButton"
+                          Margin="5"
+                          Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                          VerticalAlignment="Center"
+                          Checked="ThemeToggleButton_Checked"
+                          Unchecked="ThemeToggleButton_Unchecked"
+                          Content="Tema scuro"/>
         </StackPanel>
 
         <DataGrid x:Name="TicketGrid"
