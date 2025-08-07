@@ -35,4 +35,8 @@
 	  <PackageReference Include="HtmlAgilityPack" Version="1.12.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DashBoard\" />
+  </ItemGroup>
+
 </Project>
