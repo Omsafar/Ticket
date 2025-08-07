@@ -143,7 +143,6 @@ namespace TicketingApp
             win.Show();
         }
 
-
         private void ThemeToggleButton_Checked(object sender, RoutedEventArgs e)
         {
             SetBaseTheme(true);

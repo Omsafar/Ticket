@@ -5,20 +5,19 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Blue.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml"/>
+                <!-- Material Design dictionaries -->
             </ResourceDictionary.MergedDictionaries>
 
-            <Style TargetType="{x:Type Window}">
+            <Style TargetType="Window">
                 <Setter Property="FontFamily" Value="Segoe UI"/>
                 <Setter Property="FontSize" Value="14"/>
             </Style>
-            <Style TargetType="{x:Type Button}">
+
+            <Style TargetType="Button">
                 <Setter Property="Margin" Value="5"/>
             </Style>
-            <Style TargetType="{x:Type DataGrid}">
+
+            <Style TargetType="DataGrid">
                 <Setter Property="CanUserAddRows" Value="False"/>
                 <Setter Property="AlternatingRowBackground" Value="#FFF5F5F5"/>
                 <Setter Property="RowBackground" Value="White"/>
