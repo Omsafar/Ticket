@@ -10,7 +10,7 @@ namespace TicketingApp
         {
             if (string.IsNullOrEmpty(html))
                 return string.Empty;
-            // Convert the most common break tags to line breaks before
+            // Convert the most common break tags to line breaks beforee
             // stripping the remaining HTML so that the resulting text
             // preserves the intended formatting.
             html = Regex.Replace(html, "<(br|BR)\\s*/?>", "\n");
