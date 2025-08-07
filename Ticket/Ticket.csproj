@@ -15,10 +15,14 @@
     <Content Include="IconaTicket.ico" />
   </ItemGroup>
 
-  <ItemGroup>
+	<ItemGroup>
+		<ApplicationDefinition Include="App.xaml" />
+		<Page Include="MainWindow.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.14.2" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageReference Include="CSharpMarkup.WinUI.LiveChartsCore.SkiaSharpView" Version="3.1.2" />
     <PackageReference Include="LiveCharts.Wpf.NetCore3" Version="0.9.8" />
     <PackageReference Include="MaterialDesignColors" Version="5.2.1" />
     <PackageReference Include="MaterialDesignThemes" Version="5.2.1" />
@@ -35,8 +39,7 @@
     <PackageReference Include="Microsoft.Graph" Version="5.89.0" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.74.1" />
     <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" Version="3.12.0" />
-	  <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.7" />
-	  <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.7" />
+		<PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.7" />
 	  <PackageReference Include="HtmlAgilityPack" Version="1.12.2" />
 	  <PackageReference Include="Quicker.AvalonEdit" Version="6.3.1" />
   </ItemGroup>

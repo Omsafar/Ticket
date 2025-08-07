@@ -14,6 +14,7 @@ namespace TicketingApp
 
         public App()
         {
+            InitializeComponent();
             var services = new ServiceCollection();
 
             // 1) EF Core
