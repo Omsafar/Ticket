@@ -15,10 +15,7 @@
     <Content Include="IconaTicket.ico" />
   </ItemGroup>
 
-	<ItemGroup>
-		<ApplicationDefinition Include="App.xaml" />
-		<Page Include="MainWindow.xaml" />
-	</ItemGroup>
+
 
 	<ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.14.2" />
