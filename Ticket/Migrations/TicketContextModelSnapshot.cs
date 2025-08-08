@@ -67,6 +67,9 @@ namespace TicketingApp.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<string>("CcEmails")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("TicketId");
 
                     b.HasIndex("GraphMessageId")

@@ -24,6 +24,8 @@ namespace TicketingApp.Models
 
         public string Corpo { get; set; }
 
+        public string? CcEmails { get; set; }
+
         [Required]
         [MaxLength(200)]
         public string GraphMessageId { get; set; }

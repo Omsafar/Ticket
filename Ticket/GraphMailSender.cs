@@ -56,7 +56,8 @@ namespace TicketingApp.Graph
         public async Task SendTicketReopenedNotificationAsync(
            string fromSharedMailbox,
            string toAddress,
-           int ticketId)
+           int ticketId,
+           IEnumerable<string>? ccAddresses = null)
         {
             var mail = new Message
             {
@@ -69,7 +70,11 @@ namespace TicketingApp.Graph
                 ToRecipients = new List<Recipient>
                 {
                     new Recipient { EmailAddress = new EmailAddress { Address = toAddress } }
-                }
+                },
+                CcRecipients = ccAddresses?.Select(a => new Recipient
+                {
+                    EmailAddress = new EmailAddress { Address = a }
+                }).ToList()
             };
             var requestBody = new Microsoft.Graph.Users.Item.SendMail.SendMailPostRequestBody
             {

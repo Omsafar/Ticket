@@ -94,6 +94,12 @@ namespace TicketingApp.Services
                     continue;
                 }
 
+                var ccAddresses = msg.CcRecipients?
+                    .Select(r => r.EmailAddress?.Address)
+                    .Where(a => !string.IsNullOrWhiteSpace(a))
+                    .Select(a => a!)
+                    .ToList();
+
                 var ticket = new Ticket
                 {
                     GraphMessageId = msg.Id,
@@ -101,17 +107,13 @@ namespace TicketingApp.Services
                     MittenteEmail = msg.From?.EmailAddress?.Address ?? "unknown",
                     Oggetto = msg.Subject,
                     Corpo = HtmlUtils.ToPlainText(msg.Body?.Content),
+                    CcEmails = ccAddresses != null && ccAddresses.Any() ? string.Join(";", ccAddresses) : null,
                     Stato = "Aperto",
                     DataApertura = msg.ReceivedDateTime?.LocalDateTime ?? DateTime.Now,
                     DataUltimaModifica = msg.ReceivedDateTime?.LocalDateTime ?? DateTime.Now
                 };
 
                 await _repo.CreateAsync(ticket);
-                var ccAddresses = msg.CcRecipients?
-                    .Select(r => r.EmailAddress?.Address)
-                    .Where(a => !string.IsNullOrWhiteSpace(a))
-                    .Select(a => a!)
-                    .ToList();
                 await _mailSender.SendTicketCreatedNotificationAsync(
                     "support.ticket@paratorispa.it",
                     ticket.MittenteEmail,

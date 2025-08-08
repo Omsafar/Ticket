@@ -109,7 +109,12 @@ namespace TicketingApp
                 {
                     await _repo.UpdateStatusAsync(ticket.TicketId, "Aperto");
                     var mailSender = new GraphMailSender();
-                    await mailSender.SendTicketReopenedNotificationAsync("support.ticket@paratorispa.it", ticket.MittenteEmail, ticket.TicketId);
+                    var ccAddresses = ticket.CcEmails?
+                        .Split(';', System.StringSplitOptions.RemoveEmptyEntries)
+                        .Select(a => a.Trim())
+                        .Where(a => !string.IsNullOrWhiteSpace(a))
+                        .ToList();
+                    await mailSender.SendTicketReopenedNotificationAsync("support.ticket@paratorispa.it", ticket.MittenteEmail, ticket.TicketId, ccAddresses);
                     _manager.NotifyTicketsChanged();
                     LoadTickets();
                 }
